@@ -43,6 +43,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }).mount();
     }
 
+
+
   
     var testimonialsSlider = document.getElementById('testimonials-slider');
     if (testimonialsSlider) {
