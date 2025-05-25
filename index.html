@@ -1,14 +1,193 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 <head>
-    <meta charset="UTF-T">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coco Cove Resort - Your Slice of Paradise</title>
+    <link rel="icon" type="image/x-icon" href="icon2.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Chatbot Styles */
+        .chatbot-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .chat-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        .chat-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(59, 130, 246, 0.6);
+        }
+        
+        .chat-modal {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1001;
+        }
+        
+        .chat-header {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f8fafc;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .message.user {
+            justify-content: flex-end;
+        }
+        
+        .message-content {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .message.bot .message-content {
+            background: white;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .message.user .message-content {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .chat-input-container {
+            padding: 15px;
+            border-top: 1px solid #e5e7eb;
+            background: white;
+        }
+        
+        .chat-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 25px;
+            outline: none;
+            font-size: 14px;
+        }
+        
+        .chat-input:focus {
+            border-color: #3b82f6;
+        }
+        
+        .typing-indicator {
+            display: none;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #9ca3af;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+        
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .quick-reply {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 15px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .quick-reply:hover {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        @media (max-width: 768px) {
+            .chat-modal {
+                width: calc(100vw - 40px);
+                height: 70vh;
+                bottom: 90px;
+                right: 20px;
+                left: 20px;
+            }
+        }
+    </style>
 </head>
 <body class="bg-white">
 
@@ -29,7 +208,7 @@
         <div class="absolute inset-0 bg-black/50"></div>
         <div class="relative z-10 p-6 hero-overlay-text">
             <h1 class="font-display text-6xl md:text-8xl text-white font-bold mb-4">Coco Cove Resort</h1>
-            <p class="text-xl md:text-2xl text-white mb-8">Experience the Pinnacle of Luxury and Serenity.</p>
+            <p class="text-xl md:text-2xl text-white mb-8">Experience the Luxury and Serenity.</p>
             <a href="#pricing" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-lg text-lg shadow-xl transition duration-300 transform hover:scale-105">Book Your Stay</a>
         </div>
     </section>
@@ -47,7 +226,7 @@
                 <div class="md:w-1/2" data-aos="fade-left">
                     <h3 class="text-3xl font-semibold text-gray-800 mb-4">Our Story</h3>
                     <p class="text-gray-600 mb-4 leading-relaxed">
-                        Nestled in a pristine cove, Coco Cove Resort was born from a dream to create an unparalleled sanctuary in the middle of AlBA. We blend breathtaking natural beauty with exceptional service and world-class amenities to offer an unforgettable escape.
+                    Coco Cove Resort was born from a dream to create an unparalleled sanctuary in the middle of Albania. We blend breathtaking natural beauty with exceptional service and world-class amenities to offer an unforgettable escape.
                     </p>
                     <p class="text-gray-600 mb-6 leading-relaxed">
                         From our eco-conscious design to our curated experiences, every detail at Coco Cove is crafted to inspire moments of joy, relaxation, and connection.
@@ -151,7 +330,7 @@
     <div id="roomModal" class="modal fixed inset-0 bg-black/70 flex items-center justify-center p-4 opacity-0 invisible z-[100]">
         <div class="modal-content bg-white rounded-lg shadow-2xl max-w-2xl w-full p-6 md:p-8 transform scale-95 relative">
             <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl">×</button>
-            <img id="modalRoomImage" src="" alt="Room Image" class="w-full h-64 object-cover rounded-md mb-6">
+            <img id="modalRoomImage" src="/placeholder.svg" alt="Room Image" class="w-full h-64 object-cover rounded-md mb-6">
             <h3 id="modalRoomTitle" class="text-3xl font-semibold text-blue-600 mb-4"></h3>
             <p id="modalRoomDetails" class="text-gray-700 leading-relaxed mb-6"></p>
             <a href="#pricing" class="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-300">Book This Room</a>
@@ -191,7 +370,7 @@
 
     <section id="video-section" class="py-8 md:py-16 bg-gray-100">
   <div class="container mx-auto px-6 text-center">
-    <h2 class="text-4xl md:text-5xl font-display text-blue-600 mb-4">Experience Coco Cove Virtually</h2>
+    <h2 class="text-4xl md:text-5xl font-display text-blue-600 mb-4">Experience JALË Virtually</h2>
     <p class="text-lg text-gray-600 mb-8 md:mb-12 max-w-2xl mx-auto">Take a glimpse of JALË</p>
 
     <!-- Video container with thumbnail and play button -->
@@ -566,8 +745,6 @@
             </div>
             <div class="border-t border-gray-700 pt-8 text-center text-sm">
              <p>© 2025 Coco Cove Resort. All Rights Reserved.</p>
-
-             </p>
             </div>
         </div>
     </footer>
@@ -578,7 +755,355 @@
         </svg>
     </button>
 
+    <!-- Chatbot HTML -->
+    <div class="chatbot-container">
+        <button class="chat-button" id="chatButton" aria-label="Open Chat">
+            <i class="fas fa-comments text-xl"></i>
+        </button>
+        
+        <div class="chat-modal" id="chatModal">
+            <div class="chat-header">
+                <div>
+                    <h3 class="font-semibold">🏖️ Coco Cove Assistant</h3>
+                    <p class="text-xs opacity-90">How can I help you today?</p>
+                </div>
+                <button id="closeChatBtn" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    <div class="message-content">
+                        Welcome to Coco Cove Resort! 🌊 I'm your virtual concierge. I can help you with:
+                        <div class="quick-replies">
+                            <span class="quick-reply" data-message="Tell me about your rooms">Room Info</span>
+                            <span class="quick-reply" data-message="What activities do you offer?">Activities</span>
+                            <span class="quick-reply" data-message="Show me your pricing">Pricing</span>
+                            <span class="quick-reply" data-message="How do I make a reservation?">Booking</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." maxlength="500">
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
     <script src="script.js"></script>
+    
+    <script>
+        // Chatbot JavaScript
+        class CocoCoveChatbot {
+            constructor() {
+                this.chatButton = document.getElementById('chatButton');
+                this.chatModal = document.getElementById('chatModal');
+                this.closeChatBtn = document.getElementById('closeChatBtn');
+                this.chatMessages = document.getElementById('chatMessages');
+                this.chatInput = document.getElementById('chatInput');
+                this.typingIndicator = document.getElementById('typingIndicator');
+                
+                this.isOpen = false;
+                this.responses = this.initializeResponses();
+                
+                this.init();
+            }
+            
+            init() {
+                this.chatButton.addEventListener('click', () => this.toggleChat());
+                this.closeChatBtn.addEventListener('click', () => this.closeChat());
+                this.chatInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.sendMessage();
+                    }
+                });
+                
+                // Quick reply buttons
+                document.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('quick-reply')) {
+                        const message = e.target.getAttribute('data-message');
+                        this.chatInput.value = message;
+                        this.sendMessage();
+                    }
+                });
+            }
+            
+            initializeResponses() {
+                return {
+                    // Room information
+                    'rooms': {
+                        keywords: ['room', 'accommodation', 'suite', 'villa', 'bungalow', 'stay', 'sleep'],
+                        response: `🏨 We offer three luxurious accommodation types:
+
+🌊 **Ocean View Suite** - $250/night
+• Panoramic ocean views & private balcony
+• King-size bed & luxurious bathroom
+• Perfect for romantic getaways
+
+👨‍👩‍👧‍👦 **Family Villa** - $400/night  
+• Two bedrooms with private plunge pool
+• Kitchenette & kids club access
+• Ideal for families
+
+🏖️ **Beachfront Bungalow** - $350/night
+• Direct beach access & outdoor shower
+• Rustic-chic design
+• Your personal paradise
+
+Would you like more details about any specific room?`
+                    },
+                    
+                    // Activities
+                    'activities': {
+                        keywords: ['activity', 'activities', 'fun', 'adventure', 'water sports', 'spa', 'entertainment'],
+                        response: `🎯 Endless adventures await you at Coco Cove:
+
+🌊 **Water Activities:**
+• Jet skiing & boating
+• Snorkeling & underwater experiences
+• Beach volleyball
+
+🧘‍♀️ **Wellness & Relaxation:**
+• Luxury spa treatments
+• Beach lounging
+• Pool bar with cocktails
+
+🏊‍♂️ **Resort Amenities:**
+• Infinity pool with stunning views
+• Water slides for all ages
+• Private villa experiences
+
+What type of activity interests you most?`
+                    },
+                    
+                    // Pricing
+                    'pricing': {
+                        keywords: ['price', 'pricing', 'cost', 'rate', 'expensive', 'cheap', 'budget', 'money'],
+                        response: `💰 **Our Transparent Pricing:**
+
+🏨 **Deluxe Room** - $150/night
+• King size bed & garden view
+• Wi-Fi & mini bar included
+
+🌊 **Sea Suite** - $250/night (Most Popular!)
+• Panoramic ocean view
+• Private balcony & jacuzzi
+• Welcome champagne
+
+👨‍👩‍👧‍👦 **Family Villa** - $400/night
+• Two bedrooms & private pool
+• Kitchenette & kids club access
+
+💡 **Special Offers:**
+• Early Bird: 20% off when booking 60 days ahead
+• Weekly rates available with additional savings
+
+Ready to book your perfect getaway?`
+                    },
+                    
+                    // Booking
+                    'booking': {
+                        keywords: ['book', 'booking', 'reservation', 'reserve', 'availability', 'check-in'],
+                        response: `📅 **Ready to Book Your Stay?**
+
+**Easy Booking Process:**
+1. Choose your preferred dates
+2. Select your room type
+3. Complete your reservation
+
+📞 **Contact Information:**
+• Phone: +355 042/111/222
+• Email: reservations@cococove.com
+
+⏰ **Check-in/Check-out:**
+• Check-in: 2:00 PM
+• Check-out: 11:00 AM
+
+🎁 **What's Included:**
+• Free parking (self & valet)
+• Complimentary Wi-Fi
+• Access to all resort amenities
+
+Would you like me to help you choose the perfect room for your dates?`
+                    },
+                    
+                    // Dining
+                    'dining': {
+                        keywords: ['food', 'dining', 'restaurant', 'eat', 'meal', 'breakfast', 'dinner', 'lunch'],
+                        response: `🍽️ **Culinary Delights at Coco Cove:**
+
+🦞 **The Sea Catch**
+• Fresh seafood with stunning sea views
+• Grilled to perfection
+
+🍷 **Azure Fine Dining**
+• Gourmet international cuisine
+• Elegant dining experience
+
+☕ **The Splash Cafe**
+• Casual bites & refreshing drinks
+• Perfect for poolside dining
+
+🏨 **24/7 In-Room Dining**
+• Available anytime for your convenience
+
+Our chefs use the finest local ingredients to create unforgettable culinary experiences. Any dietary preferences I should know about?`
+                    },
+                    
+                    // Location
+                    'location': {
+                        keywords: ['location', 'where', 'address', 'albania', 'jale', 'directions'],
+                        response: `📍 **Find Your Paradise:**
+
+🇦🇱 **Location:** Jalë, Albania
+• Heart of Albania's stunning coastline
+• Paradise setting with pristine beaches
+
+🚗 **Getting Here:**
+• Free parking available
+• Easy access from major cities
+
+🗺️ **What's Nearby:**
+• Beautiful Albanian Riviera
+• Crystal clear waters
+• Breathtaking mountain views
+
+Our resort offers the perfect blend of accessibility and seclusion. Need directions or transportation assistance?`
+                    },
+                    
+                    // General/Default
+                    'default': {
+                        keywords: [],
+                        response: `I'd be happy to help you with information about Coco Cove Resort! 
+
+I can assist you with:
+• 🏨 Room information & pricing
+• 🎯 Activities & amenities  
+• 📅 Booking & reservations
+• 🍽️ Dining options
+• 📍 Location & directions
+
+What would you like to know more about?`
+                    }
+                };
+            }
+            
+            toggleChat() {
+                if (this.isOpen) {
+                    this.closeChat();
+                } else {
+                    this.openChat();
+                }
+            }
+            
+            openChat() {
+                this.chatModal.style.display = 'flex';
+                this.isOpen = true;
+                this.chatInput.focus();
+                this.scrollToBottom();
+            }
+            
+            closeChat() {
+                this.chatModal.style.display = 'none';
+                this.isOpen = false;
+            }
+            
+            sendMessage() {
+                const message = this.chatInput.value.trim();
+                if (!message) return;
+                
+                this.addMessage(message, 'user');
+                this.chatInput.value = '';
+                
+                this.showTyping();
+                
+                setTimeout(() => {
+                    this.hideTyping();
+                    const response = this.generateResponse(message);
+                    this.addMessage(response, 'bot');
+                }, 1000 + Math.random() * 1000);
+            }
+            
+            addMessage(content, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.innerHTML = content.replace(/\n/g, '<br>');
+                
+                messageDiv.appendChild(contentDiv);
+                this.chatMessages.appendChild(messageDiv);
+                
+                this.scrollToBottom();
+            }
+            
+            generateResponse(userMessage) {
+                const message = userMessage.toLowerCase();
+                
+                // Check for specific keywords in user message
+                for (const [key, responseData] of Object.entries(this.responses)) {
+                    if (key === 'default') continue;
+                    
+                    const hasKeyword = responseData.keywords.some(keyword => 
+                        message.includes(keyword.toLowerCase())
+                    );
+                    
+                    if (hasKeyword) {
+                        return responseData.response;
+                    }
+                }
+                
+                // Check for greetings
+                if (message.includes('hello') || message.includes('hi') || message.includes('hey')) {
+                    return `Hello! 👋 Welcome to Coco Cove Resort! I'm here to help you plan your perfect getaway. What would you like to know about our luxury resort in Albania?`;
+                }
+                
+                // Check for thanks
+                if (message.includes('thank') || message.includes('thanks')) {
+                    return `You're very welcome! 😊 Is there anything else I can help you with regarding your stay at Coco Cove Resort?`;
+                }
+                
+                // Check for goodbye
+                if (message.includes('bye') || message.includes('goodbye')) {
+                    return `Thank you for your interest in Coco Cove Resort! 🏖️ We look forward to welcoming you to paradise. Have a wonderful day!`;
+                }
+                
+                // Default response
+                return this.responses.default.response;
+            }
+            
+            showTyping() {
+                this.typingIndicator.style.display = 'block';
+                this.scrollToBottom();
+            }
+            
+            hideTyping() {
+                this.typingIndicator.style.display = 'none';
+            }
+            
+            scrollToBottom() {
+                setTimeout(() => {
+                    this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+                }, 100);
+            }
+        }
+        
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            new CocoCoveChatbot();
+        });
+    </script>
 </body>
 </html>
